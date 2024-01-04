@@ -1,0 +1,11 @@
+using (var txScope = IceContext.CreateDefaultTransactionScope())
+{
+ foreach(var UD01 in (from row in Db.UD01.With(LockHint.UpdLock) where
+ row.Company == Session.CompanyID && row.Key1 == "12345"
+ select row))
+ {
+  Db.UD01.Delete(UD01);
+ }
+ Db.Validate();
+ txScope.Complete();
+}

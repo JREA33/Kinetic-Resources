@@ -1,0 +1,83 @@
+// Create Job Adjustment Tableset for Labor and connect to service contract
+
+JobAdjustmentSvcContract lJobAdj = null;
+
+JobAdjustmentTableset JobAdjDataSetLabor = new JobAdjustmentTableset();
+
+lJobAdj = Ice.Assemblies.ServiceRenderer.GetService<Erp.Contracts.JobAdjustmentSvcContract>(Db);
+
+//Setup Variables
+
+var jobHead = JobEntryTS.JobHead.FirstOrDefault();
+
+var jets = JobEntryTS.JobMtl.FirstOrDefault();
+
+var jobOpDtl = JobEntryTS.JobOpDtl.FirstOrDefault();
+
+var ResGrp = ResourceGroupTS.ResourceGroup.FirstOrDefault();
+
+// Populate Labor Detail record
+
+JobAdjDataSetLabor.JALaborDtl.Add(new JALaborDtlRow());
+
+JobAdjDataSetLabor.JALaborDtl[0].ClockInDate = DateTime.Now;
+
+JobAdjDataSetLabor.JALaborDtl[0].LaborNote = "Auto Completed";
+
+JobAdjDataSetLabor.JALaborDtl[0].AssemblySeq = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].OprSeq = jets.RelatedOperation;
+
+JobAdjDataSetLabor.JALaborDtl[0].QtyCompleted = jobHead.ProdQty;
+
+JobAdjDataSetLabor.JALaborDtl[0].ActProdHours = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].ActSetupHours = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].ActBurCost = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].ActLabCost = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].EmployeeNum = EmpID;
+
+JobAdjDataSetLabor.JALaborDtl[0].EmployeeName = "";
+
+// Adjust quantities just in case there was an adjust made without op being completed
+
+JobAdjDataSetLabor.JALaborDtl[0].LaborQty = jobHead.ProdQty; //t_JobOper_OSPrep.RunQty - t_JobOper_OSPrep.QtyCompleted;
+
+JobAdjDataSetLabor.JALaborDtl[0].LaborType = "P";
+
+JobAdjDataSetLabor.JALaborDtl[0].LaborHrs = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].LaborCost = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].BurdenHrs = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].BurdenCost = 0;
+
+JobAdjDataSetLabor.JALaborDtl[0].Complete = true;
+
+JobAdjDataSetLabor.JALaborDtl[0].OpComplete = true;
+
+JobAdjDataSetLabor.JALaborDtl[0].company = "161839";
+
+JobAdjDataSetLabor.JALaborDtl[0].LaborHedSeq = 1;
+
+JobAdjDataSetLabor.JALaborDtl[0].LaborDtlSeq = 1;
+
+JobAdjDataSetLabor.JALaborDtl[0].OpCode = jobOpDtl.ResourceGrpID;
+
+JobAdjDataSetLabor.JALaborDtl[0].ResourceGrpID = jobOpDtl.ResourceGrpID;
+
+JobAdjDataSetLabor.JALaborDtl[0].JcDept = ResGrp.JCDept;
+
+JobAdjDataSetLabor.JALaborDtl[0].JobNum = jets.JobNum.ToString();
+
+JobAdjDataSetLabor.JALaborDtl[0].SysRowID = new Guid();
+
+JobAdjDataSetLabor.JALaborDtl[0].RowMod = "A";
+
+// Commit Labor record
+
+lJobAdj.CommitLaborAdj(ref JobAdjDataSetLabor);
