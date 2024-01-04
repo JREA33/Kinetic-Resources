@@ -1,0 +1,5 @@
+Use SerialNoSvc rather than SerialNoAssignSvc.
+
+SerialNoSvc requires that SNStatus be "SHIPPED"
+
+SerialNoAssignSvc sets status as "WIP"
